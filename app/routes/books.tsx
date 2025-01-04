@@ -1,58 +1,68 @@
-import { LoaderFunction } from "@remix-run/node";
+// app/routes/books.tsx
+
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { getAllBooks } from "~/data/books";
+import { getAuthToken } from "~/data/auth";
+import { Book } from "~/types/interfaces";
 import { useLoaderData } from "@remix-run/react";
 
-// Tipus per als llibres (pots modificar-los segons el que retorna l'API)
-type Book = {
-  id: number;
-  title: string;
-  author: string;
-  genre: string;
-  description: string;
-  book_img: string;
-};
+export async function loader({ request }: LoaderFunctionArgs): Promise<Book[]> {
+  const authToken = await getAuthToken(request);
 
-// Loader per obtenir els llibres des de l'API
-export const loader: LoaderFunction = async () => {
-  const response = await fetch("http://localhost:8083/api/books");
-  if (!response.ok) {
-    throw new Error("No s'han pogut carregar els llibres");
+  if (!authToken) {
+    throw new Response("Unauthorized", { status: 401 });
   }
-  const books: Book[] = await response.json();
+
+  const books = await getAllBooks(authToken);
   return books;
-};
-
-// Component principal de la pàgina
-export default function BooksPage() {
-  const books = useLoaderData<Book[]>(); // Dades del loader
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Llibres Disponibles</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {books.map((book) => (
-          <BookCard key={book.id} book={book} />
-        ))}
-      </div>
-    </div>
-  );
 }
 
-// Component per mostrar cada llibre
-function BookCard({ book }: { book: Book }) {
+export default function BookList() {
+  const books = useLoaderData<Book[]>();
+
   return (
-    <div className="bg-white shadow-md rounded-lg overflow-hidden">
-      <img
-        src={book.book_img}
-        alt={book.title}
-        className="w-full h-48 object-cover"
-      />
-      <div className="p-4">
-        <h2 className="text-xl font-bold">{book.title}</h2>
-        <p className="text-gray-600">Autor: {book.author}</p>
-        <p className="text-sm text-gray-500">Gènere: {book.genre}</p>
-        <p className="text-sm text-gray-700 mt-2 line-clamp-2">
-          {book.description}
-        </p>
+    <div className="max-w-6xl mx-auto mt-10 p-6">
+      <h1 className="text-3xl font-bold mb-6 text-primaryBlack-default dark:text-primaryYellow-default">
+        Book List
+      </h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {books.map((book) => (
+          <div
+            key={book.id}
+            className="bg-white dark:bg-primaryBlack-default p-4 rounded-lg shadow-md"
+          >
+            {book.book_img ? (
+              <img
+                src={book.book_img}
+                alt={book.title}
+                className="w-full h-40 object-cover rounded-lg mb-4"
+              />
+            ) : (
+              <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                No Image
+              </div>
+            )}
+            <h2 className="text-xl font-bold mb-2 text-primaryBlack-default dark:text-primaryWhite-default">
+              {book.title}
+            </h2>
+            <p className="text-sm text-primaryWhite-default mb-2">
+              {book.description.slice(0, 100)}...
+            </p>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-primaryYellow-default font-bold">
+                Author:
+              </span>
+              <span className="text-primaryBlack-default dark:text-primaryWhite-default">
+                {book.author}
+              </span>
+            </div>
+            <div className="mt-4 text-right">
+              <span className="text-sm italic text-gray-500">
+                Uploaded on {new Date(book.created_at).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
