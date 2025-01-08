@@ -30,14 +30,16 @@ export interface User {
 
 export interface Book {
 	id: number
-	user_id: number
-	title: string
-	author: string
-	genre: string
-	description: string
-	book_img: string
-	created_at: string
-	updated_at: string
+  	user_id: number
+  	title: string
+  	author: string
+  	genre: string
+  	description: string
+  	book_img?: string
+  	created_at: string
+  	updated_at?: string
+	user: User
+	reviews: Review[]
 }
 
 export interface Review {
@@ -49,6 +51,8 @@ export interface Review {
 	valoration: number
 	created_at: string
 	updated_at: string
+	comments: Comment[]
+	user: User
 }
 
 export interface Comment {
@@ -58,6 +62,7 @@ export interface Comment {
 	comment: string
 	created_at: string
 	updated_at: string
+	user: User
 }
 
 export interface Like {
@@ -66,6 +71,8 @@ export interface Like {
 	book_id: number
 	created_at: string
 	updated_at: string
+	user: User
+	book: Book
 }
 
 

@@ -17,11 +17,11 @@ const Header: React.FC = () => {
 						to="/index"
 						className="text-2xl md:text-3xl font-extrabold tracking-wide text-center "
 					>
-						<img
+						{/* <img
 							src="/images/El-llibres.svg"
 							alt="El Llibres"
 							className="h-12 md:h-16 hover:scale-105 transition-transform duration-200 ease-in-out"
-						/>
+						/> */}
 					</Link>
 				</div>
 
