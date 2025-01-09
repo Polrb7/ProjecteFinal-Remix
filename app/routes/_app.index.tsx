@@ -1,25 +1,27 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { getAllBooks } from "~/data/books";
-import { getAuthToken, getLoggedUserId } from "~/data/auth";
+import { getAuthToken, getLoggedUser } from "~/data/auth";
 import { Book } from "~/types/interfaces";
-import { useLoaderData } from "@remix-run/react";
-import { Link } from "@remix-run/react";
+import { useLoaderData, Form, Link } from "@remix-run/react";
 
-export async function loader({ request }: LoaderFunctionArgs): Promise<{ books: Book[], userId: number | null }> {
+export async function loader({ request }: LoaderFunctionArgs): Promise<{ books: Book[], userId: number | null, userRole: boolean, username: string }> {
   const authToken = await getAuthToken(request);
-  const userId = await getLoggedUserId(request);
+  const user = await getLoggedUser(request);
+  const userId = user.id;
+  const userRole = user.admin;
+  const username = user.username;
 
   if (!authToken) {
     throw new Response("Unauthorized", { status: 401 });
   }
 
   const books = await getAllBooks(authToken);
-  return { books, userId };
+  return { books, userId, userRole, username };
 }
 
 export default function BookList() {
-  const { books, userId } = useLoaderData<{ books: Book[], userId: number | null }>();
-
+  const { books, userId, userRole, username } = useLoaderData<{ books: Book[], userId: number | null, userRole: boolean, username: string }>();
+console.log(userRole)
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6">
       <h1 className="text-3xl font-bold mb-6 text-primaryBlack-default dark:text-primaryYellow-default">
@@ -59,21 +61,23 @@ export default function BookList() {
             <div className="mt-4 text-right">
               <span className="text-sm italic text-gray-500">
                 Uploaded on {new Date(book.created_at).toLocaleDateString()}
-              </span>
+              </span><span className="text-sm italic text-gray-500"> By {username}</span>
             </div>
             <div className="mt-4 flex justify-between">
               <button className="bg-blue-500 text-white px-4 py-2 rounded">
                  <Link to={`/books/details/${book.id}`}>View Details</Link>
               </button>
 
-              {userId === book.user_id && (
+              {userId === book.user_id || userRole == true && (
                 <>
                   <button className="bg-yellow-500 text-white px-4 py-2 rounded">
-                    Edit
+                    <Link to={`/books/edit/${book.id}`}>Edit</Link>
                   </button>
-                  <button className="bg-red-500 text-white px-4 py-2 rounded">
-                    <Link to={`/books/delete/${book.id}`}>Delete</Link>
-                  </button>
+                  <Form method="post" action={`/books/delete/${book.id}`}>
+                    <button type="submit" className="bg-red-500 text-white px-4 py-2 rounded">
+                      Delete
+                    </button>
+                  </Form>
                 </>
               )}
             </div>
