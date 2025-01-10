@@ -5,6 +5,7 @@ import { getAuthToken, getLoggedUser } from "~/data/auth";
 import { Book, User } from "~/types/interfaces";
 import { useLoaderData, Form, Link } from "@remix-run/react";
 import { useState } from "react";
+import Modal from "~/components/utils/Modal";
 
 export async function loader({ request }: LoaderFunctionArgs): Promise<{ books: Book[], users: User[], userLoggedId: number | null, userLoggedRole: boolean }> {
   const authToken = await getAuthToken(request);
@@ -18,19 +19,43 @@ export async function loader({ request }: LoaderFunctionArgs): Promise<{ books: 
 
   const users = await getAllUsers(authToken);
   const books = await getAllBooks(authToken);
-  return { books, users, userLoggedId, userLoggedRole};
+  return { books, users, userLoggedId, userLoggedRole };
 }
 
 export default function BookList() {
   const { books, users, userLoggedId, userLoggedRole } = useLoaderData<{ books: Book[], users: User[], userLoggedId: number | null, userLoggedRole: boolean }>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
+
+  const openModal = (bookId: number) => {
+    setSelectedBookId(bookId);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedBookId(null);
+  };
+
+  const confirmDelete = () => {
+    if (selectedBookId !== null) {
+      document.getElementById(`delete-form-${selectedBookId}`)?.submit();
+    }
+    closeModal();
+  };
 
   // Estat per al text del cercador
   const [searchText, setSearchText] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState("");
 
-  // Llibres filtrats segons el text del cercador
+  // Llibres filtrats segons el text del cercador i el gènere seleccionat
   const filteredBooks = books.filter((book) =>
-    book.title.toLowerCase().includes(searchText.toLowerCase())
+    book.title.toLowerCase().includes(searchText.toLowerCase()) &&
+    (selectedGenre === "" || book.genre === selectedGenre)
   );
+
+  // Obtenir tots els gèneres únics
+  const genres = Array.from(new Set(books.map((book) => book.genre)));
 
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6">
@@ -38,17 +63,35 @@ export default function BookList() {
         Book List
       </h1>
 
-      {/* Input del cercador */}
-      <input
-        type="text"
-        name="buscador"
-        id="buscador"
-        placeholder="Search..."
-        className="w-full p-2 mb-6 border border-gray-300 rounded"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)} // Actualitza l'estat amb el text introduït
-      />
-      
+      <div className="flex space-x-4 mb-6">
+        {/* Input del cercador */}
+        <input
+          type="text"
+          name="buscador"
+          id="buscador"
+          placeholder="Search..."
+          className="flex-1 p-2 border border-gray-300 rounded"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)} // Actualitza l'estat amb el text introduït
+        />
+
+        {/* Dropdown per seleccionar el gènere */}
+        <select
+          name="genre"
+          id="genre"
+          className="flex-1 p-2 border border-gray-300 rounded"
+          value={selectedGenre}
+          onChange={(e) => setSelectedGenre(e.target.value)} // Actualitza l'estat amb el gènere seleccionat
+        >
+          <option value="">All Genres</option>
+          {genres.map((genre) => (
+            <option key={genre} value={genre}>
+              {genre}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Llista de llibres filtrats */}
       <div id="llista" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredBooks.map((book: Book) => {
@@ -97,13 +140,17 @@ export default function BookList() {
                    <Link to={`/books/details/${book.id}`}>View Details</Link>
                 </button>
   
-                {userLoggedId === book.user_id || userLoggedRole == true && (
+                {(userLoggedId === book.user_id || userLoggedRole) && (
                   <>
                     <button className="bg-yellow-500 text-white px-4 py-2 rounded">
                       <Link to={`/books/edit/${book.id}`}>Edit</Link>
                     </button>
-                    <Form method="post" action={`/books/delete/${book.id}`}>
-                      <button type="submit" className="bg-red-500 text-white px-4 py-2 rounded">
+                    <Form method="post" action={`/books/delete/${book.id}`} id={`delete-form-${book.id}`}>
+                      <button
+                        type="button"
+                        className="bg-red-500 text-white px-4 py-2 rounded"
+                        onClick={() => openModal(book.id)}
+                      >
                         Delete
                       </button>
                     </Form>
@@ -114,6 +161,14 @@ export default function BookList() {
           );
         })}
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={confirmDelete}
+        title="Confirm Deletion"
+      >
+        Are you sure you want to delete this book?
+      </Modal>
     </div>
   );
 }

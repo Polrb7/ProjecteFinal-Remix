@@ -2,12 +2,12 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { getBookById } from "~/data/books";
 import { getReviewsByBookId } from "~/data/reviews";
 import { getAuthToken } from "~/data/auth";
-import { Book, Review } from "~/types/interfaces";
+import { Book, Review, User } from "~/types/interfaces";
 import { useLoaderData } from "@remix-run/react";
 import { Link } from "react-router-dom";
 import { getAllUsers } from "~/data/users";
 
-export async function loader({ params, request }: LoaderFunctionArgs): Promise<{ book: Book, reviews: Review[] }> {
+export async function loader({ params, request }: LoaderFunctionArgs): Promise<{ book: Book, reviews: Review[], users: User[] }> {
   const authToken = await getAuthToken(request);
 
   if (!authToken) {

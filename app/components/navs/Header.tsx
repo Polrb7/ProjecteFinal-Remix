@@ -37,6 +37,14 @@ const Header: React.FC = () => {
             Main Page
           </Link>
 
+          <Link
+            to="/books/add"
+            className="text-gray-100 hover:text-white 
+            hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-lg font-medium transition-colors"
+          >
+            Add Book
+          </Link>
+
           {/* Condiciona la renderització dels enllaços per a administradors */}
             <>
               <Link

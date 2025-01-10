@@ -1,14 +1,15 @@
 import { redirect } from "@remix-run/node";
-import { Form, useParams } from "@remix-run/react";
-import { createReview } from "~/data/reviews";
+import { Form } from "@remix-run/react";
+import { addBook } from "~/data/books";
 import { getAuthToken, getLoggedUser } from "~/data/auth";
 
-export async function action({ request, params }: { request: Request, params: { id: string } }) {
+export async function action({ request }: { request: Request }) {
   const formData = await request.formData();
   const title = formData.get("title");
-  const text = formData.get("text");
-  const valoration = formData.get("valoration");
-  const bookId = params.id;
+  const author = formData.get("author");
+  const genre = formData.get("genre");
+  const book_img = formData.get("book_img");
+  const description = formData.get("description");
   const authToken = await getAuthToken(request);
   const userLogged = await getLoggedUser(request);
 
@@ -16,49 +17,59 @@ export async function action({ request, params }: { request: Request, params: { 
     throw new Response("Authentication token is missing", { status: 401 });
   }
 
-  const newReview = {
+  const newBook = {
     title: String(title),
-    text: String(text),
-    valoration: Number(valoration),
-    book_id: Number(bookId),
+    author: String(author),
+    genre: String(genre),
+    book_img: String(book_img),
+    description: String(description),
     user_id: Number(userLogged.id),
   };
 
-  await createReview(newReview, authToken);
+  await addBook(newBook, authToken);
 
-  return redirect(`/books/details/${bookId}`);
+  return redirect("/index");
 }
 
-export default function AddReview() {
-  const { id } = useParams();
-
+export default function AddBook() {
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-2xl font-bold mb-4">Add Review</h1>
+      <h1 className="text-2xl font-bold mb-4">Add Book</h1>
       <Form method="post" className="bg-white p-6 rounded shadow-md">
         <input
           type="text"
           name="title"
           className="w-full border border-gray-300 rounded p-2 mb-4"
-          placeholder="Review Title"
+          placeholder="Book Title"
           required
         />
-        <textarea
-          name="text"
-          rows={4}
-          className="w-full border border-gray-300 rounded p-2 mb-4"
-          placeholder="Write your review here..."
-          required
-        ></textarea>
         <input
-          type="number"
-          name="valoration"
+          type="text"
+          name="author"
           className="w-full border border-gray-300 rounded p-2 mb-4"
-          placeholder="Rating (1-5)"
-          min="1"
-          max="5"
+          placeholder="Author"
           required
         />
+        <input
+          type="text"
+          name="genre"
+          className="w-full border border-gray-300 rounded p-2 mb-4"
+          placeholder="Genre"
+          required
+        />
+        <input
+          type="text"
+          name="book_img"
+          className="w-full border border-gray-300 rounded p-2 mb-4"
+          placeholder="Image URL"
+        />
+        <textarea 
+        name="description" 
+        id="description" 
+        placeholder="Description" 
+        className="w-full h-24 border border-gray-300 rounded p-2 mb-4" 
+        required>
+        </textarea>
         <div className="flex justify-between">
           <button
             type="submit"
@@ -67,7 +78,7 @@ export default function AddReview() {
             Submit
           </button>
           <a
-            href={`/books/details/${id}`}
+            href="/books"
             className="bg-gray-500 text-white px-4 py-2 rounded"
           >
             Cancel
