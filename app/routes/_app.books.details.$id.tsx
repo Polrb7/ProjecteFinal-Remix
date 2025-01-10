@@ -1,10 +1,13 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { getBookById } from "~/data/books";
+import { getReviewsByBookId } from "~/data/reviews";
 import { getAuthToken } from "~/data/auth";
-import { Book } from "~/types/interfaces";
+import { Book, Review } from "~/types/interfaces";
 import { useLoaderData } from "@remix-run/react";
+import { Link } from "react-router-dom";
+import { getAllUsers } from "~/data/users";
 
-export async function loader({ params, request }: LoaderFunctionArgs): Promise<Book | null> {
+export async function loader({ params, request }: LoaderFunctionArgs): Promise<{ book: Book, reviews: Review[] }> {
   const authToken = await getAuthToken(request);
 
   if (!authToken) {
@@ -21,11 +24,15 @@ export async function loader({ params, request }: LoaderFunctionArgs): Promise<B
     throw new Response("Book not found", { status: 404 });
   }
 
-  return book;
+  const users = await getAllUsers(authToken);
+
+  const reviews = await getReviewsByBookId(bookId, authToken);
+
+  return { book, reviews, users };
 }
 
 export default function BookDetails() {
-  const book = useLoaderData<Book>();
+  const { book, reviews, users } = useLoaderData<{ book: Book, reviews: Review[], users: User[] }>();
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 rounded-lg dark:bg-primaryBlack-default drop-shadow-lg">
@@ -73,36 +80,33 @@ export default function BookDetails() {
           </div>
         </div>
       </div>
+      <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
+          <Link to={`/books/${book.id}/addReview`}>Add Review</Link>
+        </button>
 
-      <div className="mt-10">
-        <h2 className="text-xl font-bold mb-4 text-primaryBlack-default dark:text-primaryYellow-default">
-          Reviews
-        </h2>
-        {book.reviews && book.reviews.length > 0 ? (
-          book.reviews.map((review) => (
-            <div
-              key={review.id}
-              className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-4"
-            >
-              <h3 className="text-lg font-bold text-primaryBlack-default dark:text-primaryWhite-default">
-                {review.title}
-              </h3>
-              <p className="text-sm text-primaryWhite-default mb-2">{review.text}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-primaryYellow-default font-bold">Rating:</span>
-                <span className="text-primaryBlack-default dark:text-primaryWhite-default">
-                  {review.valoration}
-                </span>
-              </div>
-              <div className="mt-4 text-right">
-                <span className="text-sm italic text-gray-500">
-                  Reviewed on {new Date(review.created_at).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          ))
+      <div className="bg-white p-6 rounded shadow-md mt-6">
+        <h2 className="text-2xl text-black font-bold mb-4">Reviews</h2>
+        {reviews.length > 0 ? (
+          <ul>
+            {reviews.map((review) => (
+              review.book_id === book.id && (
+                <li key={review.id} className="mb-4">
+                  <h3 className="text-lg font-bold">{review.title}</h3>
+                  <p>
+                    <strong>Valoration:</strong> {review.valoration}
+                  </p>
+                  <p>
+                    <strong>Review Text:</strong> {review.text}
+                  </p>
+                  <p>
+                    <strong>Reviewed by:</strong> {users.find((user) => user.id === review.user_id)?.username || "Unknown User"}
+                  </p>
+                </li>
+              )
+            ))}
+          </ul>
         ) : (
-          <p>No reviews available.</p>
+          <p>No Reviews available.</p>
         )}
       </div>
     </div>

@@ -2,6 +2,7 @@ import { createCookieSessionStorage } from '@remix-run/node'
 import { redirect } from '@remix-run/react'
 import axios from 'axios'
 import { LoginInput, ShowErrors } from '../types/interfaces'
+import { log } from 'node:console'
 
 const apiUrl = "http://localhost:8083"
 
@@ -57,7 +58,7 @@ async function createUserSession(
 	session.set('user_id', user_id)
 	session.set('authToken', authToken)
 
-	return redirect(redirectPath, {
+	return redirect('/index', {
 		headers: {
 			'Set-Cookie': await sessionStorage.commitSession(session),
 		},
@@ -124,6 +125,7 @@ export async function getLoggedUser(request: Request): Promise<any | null> {
 	const session = await sessionStorage.getSession(cookieHeader)
 
 	const userId = session.get('user_id')
+	
 	if (!userId) return null
 
 	try {
@@ -135,7 +137,7 @@ export async function getLoggedUser(request: Request): Promise<any | null> {
 			},
 		})
 
-		if (response.status === 200) {
+		if (response.data.httpCode === 200) {
 			return response.data.user
 		} else {
 			return null

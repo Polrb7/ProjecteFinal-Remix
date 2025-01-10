@@ -9,7 +9,7 @@ export async function loader({ request }: { request: Request }) {
     throw new Response("Authentication token is missing", { status: 401 });
   }
 
-  const userId = await getLoggedUser(authToken); // Correct function to get user ID from token
+  const userId = await getLoggedUser(request); // Correct function to get user ID from token
 
   if (!userId) {
     throw new Response("User ID not found", { status: 400 });

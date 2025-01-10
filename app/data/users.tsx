@@ -93,7 +93,7 @@ export async function updateUser(userId: number, updatedUser: Partial<User>, aut
       withCredentials: true,
     });
 
-    return response.data as User;
+    return response.data.user as User;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error('Error updating user:', error.message);

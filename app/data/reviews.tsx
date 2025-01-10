@@ -60,6 +60,18 @@ export async function getReviewById(id: number, authToken: string): Promise<Revi
   }
 }
 
+export async function getReviewsByBookId(bookId: number, authToken: string): Promise<Review[]> {
+  const response = await axios.get(`${apiUrl}/api/books/${bookId}/reviews`, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  const reviews = response.data.reviews;
+
+  return reviews;
+}
+
 export async function createReview(review: Review, authToken: string): Promise<Review> {
   const response = await axios.post(`${apiUrl}/api/reviews`, review, {
     headers: {
