@@ -69,18 +69,18 @@ export default function ViewUsers() {
                 <td className="py-2 text-center px-4 border-b">{user.username}</td>
                 <td className="py-2 text-center px-4 border-b">{user.email}</td>
                 <td className="py-2 text-center px-4 border-b">{user.age}</td>
-                <td className="py-2 flex justify-center gap-3 text-center px-4 border-b">
+                <td className="py-2 flex flex-col lg:flex-row gap-3 text-center px-4 border-b">
                   <Form method="post">
                     <input type="hidden" name="userId" value={user.id} />
                     <input type="hidden" name="actionType" value={user.admin ? "demote" : "ascend"} />
-                    <button type="submit" className={`w-auto text-white px-4 py-2 rounded ${user.admin ? "bg-yellow-500" : "bg-blue-500"}`}>
+                    <button type="submit" className={`w-full text-white px-4 py-2 rounded ${user.admin ? "bg-yellow-500" : "bg-blue-500"}`}>
                       {user.admin ? "Demote" : "Ascend"}
                     </button>
                   </Form>
                   <Form method="post">
                     <input type="hidden" name="userId" value={user.id} />
                     <input type="hidden" name="actionType" value="delete" />
-                    <button type="submit" className="bg-red-500 text-white px-4 py-2 rounded">
+                    <button type="submit" className="w-full bg-red-500 text-white px-4 py-2 rounded">
                       Delete
                     </button>
                   </Form>

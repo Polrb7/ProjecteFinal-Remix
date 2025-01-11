@@ -71,8 +71,6 @@ export interface Like {
 	book_id: number
 	created_at: string
 	updated_at: string
-	user: User
-	book: Book
 }
 
 
