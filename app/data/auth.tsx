@@ -32,12 +32,9 @@ export async function login({ email, password }: LoginInput) {
 
 	if (response.status === 200 && response.data?.token) {
 		const userId = response.data.user.id
-		const admin = response.data.user.admin
 		const authToken = response.data.token
 
-		
 		return await createUserSession(userId, authToken, '/index')
-		
 	} else {
 		const validationErr: ShowErrors = {
 			title: 'Invalid login credentials',
@@ -118,35 +115,27 @@ export async function getAuthToken(request: Request): Promise<string | null> {
 }
 
 export async function getLoggedUser(request: Request): Promise<any | null> {
-	const cookieHeader = request.headers.get('Cookie')
-
-	if (!cookieHeader) return null
-
-	const session = await sessionStorage.getSession(cookieHeader)
-
-	const userId = session.get('user_id')
-	
-	if (!userId) return null
-
+	const cookieHeader = request.headers.get('Cookie');
+	if (!cookieHeader) return null;
+  
+	const session = await sessionStorage.getSession(cookieHeader);
+	const userId = session.get('user_id');
+  
+	if (!userId) return null;
+  
 	try {
-		const response = await axios.get(`${apiUrl}/api/users/${userId}`, {
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json',
-				Authorization: `Bearer ${session.get('authToken')}`,
-			},
-		})
-
-		if (response.data.httpCode === 200) {
-			return response.data.user
-		} else {
-			return null
-		}
+	  const response = await axios.get(`${apiUrl}/api/users/${userId}`, {
+		headers: {
+		  'Content-Type': 'application/json',
+		  Authorization: `Bearer ${session.get('authToken')}`,
+		},
+	  });
+	  return response.data.user;
 	} catch (error) {
-		console.error('Error fetching user data: ', error)
-		return null
+	  console.error("Error fetching user:", error);
+	  return null;
 	}
-}
+  }
 
 export async function logout(request: Request) {
 	try {

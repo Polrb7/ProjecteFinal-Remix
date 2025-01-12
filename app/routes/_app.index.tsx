@@ -62,35 +62,6 @@ export default function BookList() {
   // Obtenir tots els gèneres únics
   const genres = Array.from(new Set(books.map((book) => book.genre)));
 
-  // Gestió dels likes
-  const handleLikeClick = async (bookId: number) => {
-    console.log("Like clicked for book:", bookId);
-    try {
-      // Verifiquem si ja existeix un like de l'usuari
-      const userLike = likes.find((like) => like.book_id === bookId && like.user_id === userLoggedId);
-  
-      if (userLike) {
-        console.log("Removing like:", userLike.id);
-        await deleteLike(userLike.id, authToken);
-        setLikes(likes.filter((like) => like.id !== userLike.id));
-      } else {
-        console.log("Adding like for book:", bookId);
-        if (userLoggedId !== null) {
-          const newLike = {
-            user_id: userLoggedId,
-            book_id: bookId,
-          }
-          await addLike(newLike, authToken);
-          console.log("New like added:", newLike);
-        }
-      }
-    } catch (error) {
-      console.error("Error handling like click:", error);
-    }
-  };
-  
-  
-
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6">
       <h1 className="text-3xl font-bold mb-6 text-primaryBlack-default dark:text-primaryYellow-default">
@@ -110,20 +81,24 @@ export default function BookList() {
         />
 
         {/* Dropdown per seleccionar el gènere */}
-        <select
-          name="genre"
-          id="genre"
-          className="flex-1 p-2 border border-gray-300 rounded"
-          value={selectedGenre}
-          onChange={(e) => setSelectedGenre(e.target.value)} // Actualitza l'estat amb el gènere seleccionat
-        >
-          <option value="">All Genres</option>
-          {genres.map((genre) => (
-            <option key={genre} value={genre}>
-              {genre}
-            </option>
-          ))}
-        </select>
+        <div className="flex-1 flex items-center">
+          <label htmlFor="genre">Genre: </label>
+          <select
+            name="genre"
+            id="genre"
+            className="flex-1 p-2 border border-gray-300 rounded"
+            value={selectedGenre}
+            onChange={(e) => setSelectedGenre(e.target.value)} // Actualitza l'estat amb el gènere seleccionat
+          >
+            <option value="">All Genres</option>
+            {genres.map((genre) => (
+              <option key={genre} value={genre}>
+                {genre}
+              </option>
+            ))}
+          </select>
+        </div>
+        
       </div>
 
       {/* Llista de llibres filtrats */}
@@ -135,55 +110,56 @@ export default function BookList() {
             <div
               id="book"
               key={book.id}
-              className="bg-white dark:bg-primaryBlack-default p-4 rounded-lg shadow-md"
+              className="bg-white p-4 rounded-lg shadow-md"
             >
-              {book.book_img ? (
-                <img
-                  src={book.book_img}
-                  alt={book.title}
-                  className="w-full h-40 object-cover rounded-lg mb-4"
-                />
-              ) : (
-                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-                  No Image
-                </div>
-              )}
-              <h2 id="title" className="text-xl font-bold mb-2 text-primaryBlack-default dark:text-primaryWhite-default">
-                {book.title}
-              </h2>
-              <p className="text-sm text-primaryWhite-default mb-2">
-                Genre: {book.genre}
-              </p>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-primaryYellow-default font-bold">
-                  Author:
-                </span>
-                <span className="text-primaryBlack-default dark:text-primaryWhite-default">
-                  {book.author}
-                </span>
-              </div>
-              <div className="mt-4 text-right">
-                <span className="text-sm italic text-gray-500">
-                  Uploaded on {new Date(book.created_at).toLocaleDateString()}
-                </span>
-                {user && (
-                  <span className="text-sm italic text-gray-500"> by {user.username}</span>
+              <Link to={`/books/details/${book.id}`}>
+                {book.book_img ? (
+                  <img
+                    src={book.book_img}
+                    alt={book.title}
+                    className="w-full h-40 object-cover rounded-lg mb-4" />
+                ) : (
+                  <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                    No Image
+                  </div>
                 )}
-              </div>
-              <div className="mt-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded">
-                   <Link to={`/books/details/${book.id}`}>View Details</Link>
+                <h2 id="title" className="text-xl font-bold mb-2 text-primaryBlack-default dark:text-primaryWhite-default">
+                  {book.title}
+                </h2>
+                <p className="text-sm text-primaryWhite-default mb-2">
+                  Genre: {book.genre}
+                </p>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-primaryYellow-default font-bold">
+                    Author:
+                  </span>
+                  <span className="text-primaryBlack-default dark:text-primaryWhite-default">
+                    {book.author}
+                  </span>
+                </div>
+                <div className="mt-4 text-right">
+                  <span className="text-sm italic text-gray-500">
+                    Uploaded on {new Date(book.created_at).toLocaleDateString()}
+                  </span>
+                  {user && (
+                    <span className="text-sm italic text-gray-500"> by {user.username}</span>
+                  )}
+                </div>
+              </Link>
+              <div className="mt-4 flex justify-evenly flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+                <button className="bg-blue-700 text-white px-4 py-2 rounded">
+                  <Link to={`/books/details/${book.id}`}>View Details</Link>
                 </button>
-  
+
                 {(userLoggedId === book.user_id || userLoggedRole) && (
                   <>
-                    <button className="bg-yellow-500 text-white px-4 py-2 rounded">
+                    <button className="bg-yellow-700 text-white px-4 py-2 rounded">
                       <Link to={`/books/edit/${book.id}`}>Edit</Link>
                     </button>
                     <Form method="post" action={`/books/delete/${book.id}`} id={`delete-form-${book.id}`}>
                       <button
                         type="button"
-                        className="bg-red-500 w-full text-white px-4 py-2 rounded"
+                        className="bg-red-600 w-full text-white px-4 py-2 rounded"
                         onClick={() => openModal(book.id)}
                       >
                         Delete
@@ -193,14 +169,21 @@ export default function BookList() {
                 )}
               </div>
               <div className="mt-4 flex justify-center">
-                <button
-                  className="focus:outline-none"
-                  onClick={() => handleLikeClick(book.id)}
-                >
-                  <FaHeart
-                    className={userLike ? "text-red-500 cursor-pointer" : "text-gray-400 cursor-pointer"}
-                  />
-                </button>
+                {userLike ? (
+                  <Form method="post" action={`/likes/delete/${userLike.id}`}>
+                    <button aria-label="like" type="submit">
+                      <FaHeart
+                        className={"text-red-500 cursor-pointer"} />
+                    </button>
+                  </Form>
+                ) : (
+                  <Form method="post" action={`/likes/add/${book.id}`}>
+                    <button aria-label="like" type="submit">
+                      <FaHeart
+                        className={"text-gray-400 cursor-pointer"} />
+                    </button>
+                  </Form>
+                )}
               </div>
             </div>
           );

@@ -7,34 +7,47 @@ import { useLoaderData } from "@remix-run/react";
 import { Link } from "react-router-dom";
 import { getAllUsers } from "~/data/users";
 
-export async function loader({ params, request }: LoaderFunctionArgs): Promise<{ book: Book, reviews: Review[], users: User[] }> {
+export async function loader({ params, request }: LoaderFunctionArgs): Promise<{ book: Book, filteredReviews: Review[], reviews: Review[], users: User[] }> {
   const authToken = await getAuthToken(request);
 
+  // Comprova si hi ha token d'autenticació
   if (!authToken) {
     throw new Response("Unauthorized", { status: 401 });
   }
 
+  // Comprova si l'ID del llibre és vàlid
   const bookId = parseInt(params.id as string, 10);
   if (isNaN(bookId)) {
     throw new Response("Invalid book ID", { status: 400 });
   }
 
+  // Obté el llibre pel seu ID
   const book = await getBookById(bookId, authToken);
   if (!book) {
     throw new Response("Book not found", { status: 404 });
   }
 
+  // Obté tots els usuaris
   const users = await getAllUsers(authToken);
 
-  const reviews = await getReviewsByBookId(bookId, authToken);
+  // Obté les reviews i garanteix que és un array
+  const reviews = (await getReviewsByBookId(bookId, authToken)) || [];
+  if (!Array.isArray(reviews)) {
+    console.error("Unexpected reviews format:", reviews);
+    throw new Error("Expected reviews to be an array");
+  }
 
-  return { book, reviews, users };
+  // Filtra les reviews que pertanyen a aquest llibre
+  const filteredReviews = reviews.filter(review => review.book_id === bookId);
+
+  return { book, filteredReviews, reviews, users };
 }
 
 export default function BookDetails() {
-  const { book, reviews, users } = useLoaderData<{ book: Book, reviews: Review[], users: User[] }>();
+  const { book, filteredReviews, reviews, users } = useLoaderData<{ book: Book, filteredReviews: Review[], reviews: Review[], users: User[] }>();
 
   return (
+    
     <div className="max-w-4xl mx-auto mt-10 p-6 rounded-lg dark:bg-primaryBlack-default drop-shadow-lg">
       <div className="flex flex-col md:flex-row gap-10 items-center md:items-start">
         {book.book_img ? (
@@ -80,7 +93,7 @@ export default function BookDetails() {
           </div>
         </div>
       </div>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
+      <button className="bg-blue-600 text-white px-4 py-2 rounded mt-4">
           <Link to={`/books/${book.id}/addReview`}>Add Review</Link>
         </button>
 
@@ -88,22 +101,24 @@ export default function BookDetails() {
         <h2 className="text-2xl text-black font-bold mb-4">Reviews</h2>
         {reviews.length > 0 ? (
           <ul>
-            {reviews.map((review) => (
-              review.book_id === book.id && (
-                <li key={review.id} className="mb-4">
-                  <h3 className="text-lg font-bold">{review.title}</h3>
-                  <p>
-                    <strong>Valoration:</strong> {review.valoration}
-                  </p>
-                  <p>
-                    <strong>Review Text:</strong> {review.text}
-                  </p>
-                  <p>
-                    <strong>Reviewed by:</strong> {users.find((user) => user.id === review.user_id)?.username || "Unknown User"}
-                  </p>
-                </li>
-              )
-            ))}
+            {filteredReviews.map((review) => (
+            <><li key={review.id} className="mb-4">
+                <h3 className="text-lg font-bold">{review.title}</h3>
+                <p>
+                  <strong>Valoration:</strong> {review.valoration}
+                </p>
+                <p>
+                  <strong>Review Text:</strong> {review.text}
+                </p>
+                <p>
+                  <strong>Reviewed by:</strong> {users.find((user) => user.id === review.user_id)?.username || "Unknown User"}
+                </p>
+              </li><>
+                  <button className="bg-blue-600 w-auto text-white px-4 py-2 rounded">
+                    <Link to={`/reviews/details/${review.id}`}>View Details</Link>
+                  </button>
+                </></>
+          ))}
           </ul>
         ) : (
           <p>No Reviews available.</p>

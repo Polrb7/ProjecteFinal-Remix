@@ -73,14 +73,14 @@ export default function ViewUsers() {
                   <Form method="post">
                     <input type="hidden" name="userId" value={user.id} />
                     <input type="hidden" name="actionType" value={user.admin ? "demote" : "ascend"} />
-                    <button type="submit" className={`w-full text-white px-4 py-2 rounded ${user.admin ? "bg-yellow-500" : "bg-blue-500"}`}>
+                    <button type="submit" className={`w-full text-white px-4 py-2 rounded ${user.admin ? "bg-yellow-700" : "bg-blue-600"}`}>
                       {user.admin ? "Demote" : "Ascend"}
                     </button>
                   </Form>
                   <Form method="post">
                     <input type="hidden" name="userId" value={user.id} />
                     <input type="hidden" name="actionType" value="delete" />
-                    <button type="submit" className="w-full bg-red-500 text-white px-4 py-2 rounded">
+                    <button type="submit" className="w-full bg-red-600 text-white px-4 py-2 rounded">
                       Delete
                     </button>
                   </Form>

@@ -143,7 +143,7 @@ export async function deleteBook(bookId: number, authToken: string): Promise<voi
 // Fetch all books for a specific user
 export async function getAllBooksByUser(userId: number, authToken: string): Promise<Book[]> {
   try {
-    const response = await axios.get(`${apiUrl}/api/getAllBooksByUser?userId=${userId}`, {
+    const response = await axios.get(`${apiUrl}/api/users/${userId}/books`, {
       headers: {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/json',
@@ -152,7 +152,14 @@ export async function getAllBooksByUser(userId: number, authToken: string): Prom
       withCredentials: true,
     });
 
-    return response.data as Book[];
+    const books = response.data.books;
+
+    if (!Array.isArray(books)) {
+      console.error("Books data is not an array:", response.data);
+      throw new Error("Books data is not an array");
+    }
+
+    return books as Book[];
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error('Error fetching books for user:', error.message);

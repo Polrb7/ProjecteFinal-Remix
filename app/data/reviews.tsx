@@ -67,10 +67,21 @@ export async function getReviewsByBookId(bookId: number, authToken: string): Pro
     },
   });
 
+  if (response.status !== 200) {
+    throw new Error("Failed to fetch reviews");
+  }
+
   const reviews = response.data.reviews;
+
+  // Garanteix que sempre retornem un array
+  if (!Array.isArray(reviews)) {
+    console.error("Unexpected reviews format:", reviews);
+    return [];
+  }
 
   return reviews;
 }
+
 
 export async function createReview(review: Review, authToken: string): Promise<Review> {
   const response = await axios.post(`${apiUrl}/api/reviews`, review, {

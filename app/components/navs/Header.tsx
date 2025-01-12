@@ -89,7 +89,7 @@ const Header: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6 mt-4 lg:mt-0">
             <>
               <Link
-                // to={`viewProfile/${user.id}`}
+                to={`viewProfile/${user?.id}`}
                 className="text-gray-100 hover:text-white 
                 hover:scale-105 hover:bg-gray-800 hover:font-semibold pl-5 hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
               >

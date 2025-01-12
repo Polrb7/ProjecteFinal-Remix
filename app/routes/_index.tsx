@@ -12,7 +12,7 @@ export default function Index() {
         <h1 className="text-5xl font-bold mb-4 text-indigo-700">EL Llibres</h1>
         <h2 className="text-2xl mb-8 text-gray-800">Benvingut a la nostra aplicació!</h2>
         <p className="text-lg mb-8 text-gray-700">
-          Explora una vasta col·lecció de llibres i troba els teus favorits. Uneix-te a la nostra comunitat avui mateix!
+          Explora una gran col·lecció de llibres i troba els teus favorits. Uneix-te a la nostra comunitat avui mateix!
         </p>
         <div className="flex justify-center space-x-4">
           <Link to="/login">

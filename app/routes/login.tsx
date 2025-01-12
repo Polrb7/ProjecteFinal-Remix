@@ -34,7 +34,6 @@ export async function action({ request }: ActionFunctionArgs) {
 		return await login({ email, password })
 	} catch (error: unknown) {
 		// console.error('Error during authentication:', error)
-
 		return error
 	}
 }

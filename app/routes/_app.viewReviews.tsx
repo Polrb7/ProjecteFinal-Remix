@@ -42,11 +42,11 @@ export default function ViewReviews() {
                 <td className="py-2 text-center px-4 border-b">{review.valoration}</td>
                 <td className="py-2 flex justify-center gap-3 text-center px-4 border-b">
                   <>
-                    <button className="bg-blue-500 w-auto text-white px-4 py-2 rounded">
+                    <button className="bg-blue-600 w-auto text-white px-4 py-2 rounded">
                       <Link to={`/reviews/details/${review.id}`}>View Details</Link>
                     </button>
                     <Form method="post" action={`/reviews/delete/${review.id}`}>
-                      <button type="submit" className="bg-red-500 text-white px-4 py-2 rounded">
+                      <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded">
                         Delete
                       </button>
                     </Form>

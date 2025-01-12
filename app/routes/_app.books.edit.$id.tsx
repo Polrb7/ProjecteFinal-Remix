@@ -44,6 +44,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     title: formData.get("title") as string,
     genre: formData.get("genre") as string,
     author: formData.get("author") as string,
+    book_img: formData.get("image") as string,
     description: formData.get("description") as string,
   };
 
@@ -101,6 +102,18 @@ export default function EditBook() {
           />
         </div>
         <div>
+          <label className="block font-bold mb-2" htmlFor="image">
+            Image
+          </label>
+          <input
+            type="text"
+            id="image"
+            name="image"
+            defaultValue={book.book_img}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+        <div>
           <label className="block font-bold mb-2" htmlFor="author">
             Description
           </label>
@@ -111,13 +124,13 @@ export default function EditBook() {
           <button
             type="button"
             className="bg-gray-500 text-white px-4 py-2 rounded"
-            onClick={() => navigate(-1)} // Torna a la pàgina anterior
+            onClick={() => navigate("/index")}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             Save Changes
           </button>
