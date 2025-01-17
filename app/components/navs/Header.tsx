@@ -5,6 +5,8 @@ import { getLoggedUser } from '~/data/auth';
 
 export async function loader({ request }: { request: Request }) {
   const user = await getLoggedUser(request);
+  console.log(user);
+  
   return user;
 }
 
@@ -40,7 +42,7 @@ const Header: React.FC = () => {
         </div>
 
         <div className={`w-full lg:flex lg:items-center lg:w-auto ${isOpen ? 'block' : 'hidden'}`}>
-          <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-12">
+          <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-12 mx-auto">
             <Link
               to="/index"
               className="text-gray-100 hover:text-white 
@@ -55,56 +57,45 @@ const Header: React.FC = () => {
             >
               Add Book
             </Link>
-            <>
-              <Link
-                to="/viewUsers"
-                className="text-gray-100 hover:text-white 
-                hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
-              >
-                View Users
-              </Link>
-              <Link
-                to="/viewBooks"
-                className="text-gray-100 hover:text-white 
-                hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
-              >
-                View Books
-              </Link>
-              <Link
-                to="/viewReviews"
-                className="text-gray-100 hover:text-white 
-                hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
-              >
-                View Reviews
-              </Link>
-              <Link
-                to="/viewComments"
-                className="text-gray-100 hover:text-white 
-                hover:scale-105 hover:bg-gray-800 hover:font-semibold pr-5 hover:px-5 hover:py-5 hover:rounded text-md font-medium transition-colors"
-              >
-                View Comments
-              </Link>
-            </>
+            <Link
+              to="/viewUsers"
+              className="text-gray-100 hover:text-white 
+              hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
+            >
+              View Users
+            </Link>
+            <Link
+              to="/viewBooks"
+              className="text-gray-100 hover:text-white 
+              hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
+            >
+              View Books
+            </Link>
+            <Link
+              to="/viewReviews"
+              className="text-gray-100 hover:text-white 
+              hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
+            >
+              View Reviews
+            </Link>
+            <Link
+              to="/viewComments"
+              className="text-gray-100 hover:text-white 
+              hover:scale-105 hover:bg-gray-800 hover:font-semibold pr-5 hover:px-5 hover:py-5 hover:rounded text-md font-medium transition-colors"
+            >
+              View Comments
+            </Link>
           </div>
           <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6 mt-4 lg:mt-0">
-            <>
-              <Link
-                to={`viewProfile/${user?.id}`}
+            <Form method="post" action="/logout" className="w-full">
+              <button
+                type="submit"
                 className="text-gray-100 hover:text-white 
-                hover:scale-105 hover:bg-gray-800 hover:font-semibold pl-5 hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
+                hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
               >
-                Profile
-              </Link>
-              <Form method="post" action="/logout" className="w-full">
-                <button
-                  type="submit"
-                  className="text-gray-100 hover:text-white 
-                  hover:scale-105 hover:bg-gray-800 hover:font-semibold hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
-                >
-                  Logout
-                </button>
-              </Form>
-            </>
+                Logout
+              </button>
+            </Form>
           </div>
         </div>
       </div>

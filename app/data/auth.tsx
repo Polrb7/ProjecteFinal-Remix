@@ -55,7 +55,7 @@ async function createUserSession(
 	session.set('user_id', user_id)
 	session.set('authToken', authToken)
 
-	return redirect('/index', {
+	return redirect(`${redirectPath}`, {
 		headers: {
 			'Set-Cookie': await sessionStorage.commitSession(session),
 		},

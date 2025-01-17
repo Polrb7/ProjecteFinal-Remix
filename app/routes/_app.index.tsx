@@ -14,6 +14,8 @@ export async function loader({ request }: LoaderFunctionArgs): Promise<{ books: 
   const userLogged = await getLoggedUser(request);
   const userLoggedId = userLogged.id;
   const userLoggedRole = userLogged.admin;
+  console.log(userLoggedId);
+  
 
   if (!authToken) {
     throw new Response("Unauthorized", { status: 401 });
@@ -63,7 +65,16 @@ export default function BookList() {
   const genres = Array.from(new Set(books.map((book) => book.genre)));
 
   return (
+    <>
     <div className="max-w-6xl mx-auto mt-10 p-6">
+    <div className="flex justify-end">
+      <Link
+      to={`/viewProfile/${userLoggedId}`}
+      className="text-black hover:scale-105 hover:bg-gray-300 hover:font-semibold pl-5 hover:px-3 hover:py-2 hover:rounded text-md font-medium transition-colors"
+      >
+      Profile
+      </Link>
+    </div>
       <h1 className="text-3xl font-bold mb-6 text-primaryBlack-default dark:text-primaryYellow-default">
         Book List
       </h1>
@@ -198,5 +209,6 @@ export default function BookList() {
         Are you sure you want to delete this book?
       </Modal>
     </div>
+    </>
   );
 }

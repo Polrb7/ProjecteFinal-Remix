@@ -96,13 +96,14 @@ export async function updateUser(userId: number, updatedUser: Partial<User>, aut
     return response.data.user as User;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error('Error updating user:', error.message);
-      throw new Error('Error updating user');
+      console.error('Error updating user:', error.response?.data); // Mostrar detalls de l'error
+      throw new Error(error.response?.data.message || 'Error updating user');
     } else {
       throw error;
     }
   }
 }
+
 
 // Delete a user
 export async function deleteUser(userId: number, authToken: string): Promise<void> {
