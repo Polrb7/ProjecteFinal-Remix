@@ -1,7 +1,7 @@
 import { createCookieSessionStorage } from '@remix-run/node';
 import { redirect } from '@remix-run/react';
 import axios from 'axios';
-import { LoginInput, ShowErrors } from '../types/interfaces';
+import { LoginInput, ShowErrors, User } from '../types/interfaces';
 
 const apiUrl = "http://localhost:8083";
 
@@ -42,6 +42,46 @@ export async function login({ email, password }: LoginInput) {
 
     throw validationError;
   }
+}
+
+export async function register(
+	name: string,
+  surname: string,
+	username: string,
+  age: number,
+	email: string,
+	password: string,
+	password_confirmation: string,
+) {
+	try {
+		const response = await axios.post(
+			`${apiUrl}/api/register`,
+			{ name, surname, username, age, email, password, password_confirmation },
+			{
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
+				withCredentials: true,
+			}
+		)
+
+		if (response.status === 200) {
+			const userId = response.data.user.id
+			const authToken = response.data.token
+
+			return createUserSession(userId, authToken, '/index')
+		} else {
+			return {
+				error: {
+					message: response.data,
+					code: response.status,
+				},
+			}
+		}
+	} catch (error) {
+		return error
+	}
 }
 
 async function createUserSession(user_id: string, authToken: string, redirectPath: string) {
