@@ -1,6 +1,6 @@
 // routes/viewProfile.$userId.tsx
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { getAuthToken } from "~/data/auth";
 import { getAllBooks } from "~/data/books";
 import { getUserReviews } from "~/data/reviews";
@@ -51,14 +51,17 @@ export async function loader({ params, request }: LoaderFunctionArgs): Promise<{
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {books.length > 0 ? (
             books.map((book) => (
-              <div key={book.id} className="bg-white p-4 rounded-lg shadow-md">
-            <h3 className="text-xl font-bold mb-2">{book.title}</h3>
-            <p className="text-sm text-gray-600">Genre: {book.genre}</p>
-            <p className="text-sm text-gray-600">Author: {book.author}</p>
-            <p className="text-sm text-gray-600">
-              Uploaded on {new Date(book.created_at).toLocaleDateString()}
-            </p>
-              </div>
+              <><div key={book.id} className="bg-white p-4 rounded-lg shadow-md">
+                <h3 className="text-xl font-bold mb-2">{book.title}</h3>
+                <p className="text-sm text-gray-600">Genre: {book.genre}</p>
+                <p className="text-sm text-gray-600">Author: {book.author}</p>
+                <p className="text-sm text-gray-600">
+                  Uploaded on {new Date(book.created_at).toLocaleDateString()}
+                </p>
+                <button className="bg-blue-700 text-white px-4 mt-2 py-2 rounded">
+                  <Link to={`/books/details/${book.id}`}>View Details</Link>
+                </button>
+              </div></>
             ))
           ) : (
             <p className="text-sm text-gray-600">No books published by this user.</p>

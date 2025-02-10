@@ -16,33 +16,6 @@ export const sessionStorage = createCookieSessionStorage({
   },
 });
 
-export async function login({ email, password }: LoginInput) {
-  const response = await axios.post(
-    `${apiUrl}/api/login`,
-    { email, password },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      withCredentials: true,
-    }
-  );
-
-  if (response.status === 200 && response.data?.token) {
-    const userId = response.data.user.id;
-    const authToken = response.data.token;
-
-    return await createUserSession(userId, authToken, '/index');
-  } else {
-    const validationError: ShowErrors = {
-      title: 'Invalid login credentials',
-      code: '401',
-    };
-
-    throw validationError;
-  }
-}
 
 export async function register(
 	name: string,
@@ -84,7 +57,7 @@ export async function register(
 	}
 }
 
-async function createUserSession(user_id: string, authToken: string, redirectPath: string) {
+export async function createUserSession(user_id: string, authToken: string, redirectPath: string) {
   const session = await sessionStorage.getSession();
 
   session.set('user_id', user_id);
