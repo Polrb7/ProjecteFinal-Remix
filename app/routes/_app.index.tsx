@@ -166,7 +166,12 @@ export default function BookList() {
                       Uploaded on {new Date(book.created_at).toLocaleDateString()}
                     </span>
                     {user && (
-                      <span className="text-sm italic text-gray-500"> by {user.username}</span>
+                      <Link
+                        to={`/viewProfile/${user.id}`}
+                        className="text-sm italic text-gray-500 underline hover:text-blue-700"
+                      >
+                        by {user.username}
+                      </Link>
                     )}
                   </div>
                 </Link>

@@ -60,6 +60,27 @@ export async function getReviewById(id: number, authToken: string): Promise<Revi
   }
 }
 
+export async function getUserReviews(userId: string, authToken: string): Promise<Review[]> {
+  try {
+    const response = await axios.get(`${apiUrl}/api/reviews/user/${userId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (response.status === 200) {
+      return response.data.reviews;
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching user reviews:", error);
+    return [];
+  }
+}
+
 export async function getReviewsByBookId(bookId: number, authToken: string): Promise<Review[]> {
   const response = await axios.get(`${apiUrl}/api/books/${bookId}/reviews`, {
     headers: {

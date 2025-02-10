@@ -106,7 +106,12 @@ export default function ViewUsers() {
               {filteredUsers.map((user) => (
                 <tr key={user.id}>
                   <td className="py-2 text-center px-4 border-b">{user.id}</td>
-                  <td className="py-2 text-center px-4 border-b">{user.name}</td>
+                  <td className="py-2 text-center px-4 border-b underline">
+                    <Link
+                        to={`/viewProfile/${user.id}`}
+                      >
+                        {user.name}
+                      </Link></td>
                   <td className="py-2 text-center px-4 border-b">{user.surname}</td>
                   <td className="py-2 text-center px-4 border-b">{user.username}</td>
                   <td className="py-2 text-center px-4 border-b">{user.email}</td>
